@@ -2,12 +2,12 @@ const api = axios.create({
   baseURL: 'https://api.themoviedb.org/3/',
   headers: {
     'Content-Type': 'application/json;charset=utf-8',
+    'Cache-Control': 'public, max-age=548'
   },
   params: {
     'api_key': API_KEY,
-  },
+  }
 });
-
 
 // Utils
 
@@ -55,12 +55,26 @@ function createCategories(categories, container) {
   });
 }
 
+// Skeletons
+
+function createMoviesSkeleton(container) {
+  Array.from({ length: 5 }).forEach((_) => {
+    const movieContainer = document.createElement('div');
+    movieContainer.classList.add('movie-container');
+
+    const skeleton = document.createElement('div');
+    skeleton.classList.add('skeleton');
+    movieContainer.appendChild(skeleton);
+    container.appendChild(movieContainer);
+  });
+}
+
 // Llamados a la API
 
 async function getTrendingMoviesPreview() {
+  createMoviesSkeleton(trendingMoviesPreviewList);
   const { data } = await api('trending/movie/day');
   const movies = data.results;
-  console.log(movies)
 
   createMovies(movies, trendingMoviesPreviewList);
 }
