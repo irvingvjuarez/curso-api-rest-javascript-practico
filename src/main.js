@@ -12,10 +12,10 @@ const api = axios.create({
 // Utils
 
 function createMovies(movies, container) {
-  container.innerHTML = '';
+  const movieContainers = container.querySelectorAll('.movie-container');
 
-  movies.forEach(movie => {
-    const movieContainer = document.createElement('div');
+  movies.forEach((movie, index) => {
+    const movieContainer = movieContainers[index] || document.createElement('div');
     movieContainer.classList.add('movie-container');
     movieContainer.addEventListener('click', () => {
       location.hash = '#movie=' + movie.id;
@@ -29,7 +29,12 @@ function createMovies(movies, container) {
       'https://image.tmdb.org/t/p/w300' + movie.poster_path,
     );
 
-    movieContainer.appendChild(movieImg);
+    if (movieContainer.hasChildNodes()) {
+      movieContainer.replaceChild(movieImg, movieContainer.firstChild);
+    } else {
+      movieContainer.appendChild(movieImg);
+    }
+
     container.appendChild(movieContainer);
   });
 }
