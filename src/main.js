@@ -97,14 +97,17 @@ function createObserver(container, page, handler) {
 
 // Llamados a la API
 
-async function getTrendingMoviesPreview(currentPage = 1) {
-  createMoviesSkeleton(trendingMoviesPreviewList);
-  const { data } = await api(`trending/movie/day?page=${currentPage}`);
-  const movies = data.results;
-
-  if (currentPage + 1 <= data.total_pages) {
+async function getTrendingMoviesPreview(page = 1, totalPages = 1) {
+  if (page <= totalPages) {
+    createMoviesSkeleton(trendingMoviesPreviewList);
+    const { data } = await api(`trending/movie/day?page=${page}`);
+    const movies = data.results;
     createMovies(movies, trendingMoviesPreviewList);
-    createObserver(trendingMoviesPreviewList, currentPage + 1, getTrendingMoviesPreview);
+    createObserver(
+      trendingMoviesPreviewList, 
+      page + 1, 
+      (currentPage) => getTrendingMoviesPreview(currentPage, data.total_pages)
+    );
   }
 }
 
