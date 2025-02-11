@@ -82,11 +82,11 @@ function removeMoviesSkeleton(container) {
 }
 
 // Intersection observer
-function createObserver(container, page) {
+function createObserver(container, page, handler) {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
-        getTrendingMoviesPreview(page);
+        handler(page);
         observer.unobserve(entry.target);
       }
     });
@@ -100,12 +100,11 @@ function createObserver(container, page) {
 async function getTrendingMoviesPreview(currentPage = 1) {
   createMoviesSkeleton(trendingMoviesPreviewList);
   const { data } = await api(`trending/movie/day?page=${currentPage}`);
-  console.log(data)
   const movies = data.results;
 
   if (currentPage + 1 <= data.total_pages) {
     createMovies(movies, trendingMoviesPreviewList);
-    createObserver(trendingMoviesPreviewList, currentPage + 1);
+    createObserver(trendingMoviesPreviewList, currentPage + 1, getTrendingMoviesPreview);
   }
 }
 
@@ -169,6 +168,7 @@ async function getMovieById(id) {
 }
 
 async function getRelatedMoviesId(id) {
+  createMoviesSkeleton(relatedMoviesContainer);
   const { data } = await api(`movie/${id}/recommendations`);
   const relatedMovies = data.results;
 
