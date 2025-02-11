@@ -103,8 +103,10 @@ async function getTrendingMoviesPreview(currentPage = 1) {
   console.log(data)
   const movies = data.results;
 
-  createMovies(movies, trendingMoviesPreviewList);
-  createObserver(trendingMoviesPreviewList, currentPage + 1);
+  if (currentPage + 1 <= data.total_pages) {
+    createMovies(movies, trendingMoviesPreviewList);
+    createObserver(trendingMoviesPreviewList, currentPage + 1);
+  }
 }
 
 async function getCategegoriesPreview() {
