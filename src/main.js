@@ -12,10 +12,10 @@ const api = axios.create({
 // Utils
 
 function createMovies(movies, container) {
-  const movieContainers = container.querySelectorAll('.movie-container');
+  removeMoviesSkeleton(container);
 
-  movies.forEach((movie, index) => {
-    const movieContainer = movieContainers[index] || document.createElement('div');
+  movies.forEach(movie => {
+    const movieContainer = document.createElement('div');
     movieContainer.classList.add('movie-container');
     movieContainer.addEventListener('click', () => {
       location.hash = '#movie=' + movie.id;
@@ -74,14 +74,37 @@ function createMoviesSkeleton(container) {
   });
 }
 
+function removeMoviesSkeleton(container) {
+  const skeletons = container.querySelectorAll('.skeleton');
+  skeletons.forEach((skeleton) => {
+    skeleton.parentElement.remove();
+  });
+}
+
+// Intersection observer
+function createObserver(container, page) {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        getTrendingMoviesPreview(page);
+        observer.unobserve(entry.target);
+      }
+    });
+  });
+
+  observer.observe(container.lastChild);
+}
+
 // Llamados a la API
 
-async function getTrendingMoviesPreview() {
+async function getTrendingMoviesPreview(currentPage = 1) {
   createMoviesSkeleton(trendingMoviesPreviewList);
-  const { data } = await api('trending/movie/day');
+  const { data } = await api(`trending/movie/day?page=${currentPage}`);
+  console.log(data)
   const movies = data.results;
 
   createMovies(movies, trendingMoviesPreviewList);
+  createObserver(trendingMoviesPreviewList, currentPage + 1);
 }
 
 async function getCategegoriesPreview() {
