@@ -167,10 +167,12 @@ async function getMovieById(id) {
   getRelatedMoviesId(id);
 }
 
-async function getRelatedMoviesId(id) {
-  createMoviesSkeleton(relatedMoviesContainer);
-  const { data } = await api(`movie/${id}/recommendations`);
-  const relatedMovies = data.results;
-
-  createMovies(relatedMovies, relatedMoviesContainer);
+async function getRelatedMoviesId(id, page = 1, totalPages = 1) {
+  if (page <= totalPages) {
+    createMoviesSkeleton(relatedMoviesContainer);
+    const { data } = await api(`movie/${id}/recommendations?page=${page}`);
+    const relatedMovies = data.results;
+    createMovies(relatedMovies, relatedMoviesContainer);
+    createObserver(relatedMoviesContainer, page + 1, (currentPage) => getRelatedMoviesId(id, currentPage, data.total_pages));
+  }
 }
